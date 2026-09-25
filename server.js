@@ -1,154 +1,143 @@
 const express = require("express");
-const dotenv = require("dotenv");
-
-dotenv.config();
+const path = require("path");
+const { Readable } = require("stream");
 
 const app = express();
 
-// Online hosting + localhost dono ke liye
+app.use(express.json({ limit: "10mb" }));
+app.use(express.static(path.join(__dirname)));
+
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: "10mb" }));
-app.use(express.static(__dirname));
-
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // ==========================================
-// GEMINI TEXT AI
+// GEMINI CHAT - STREAMING
 // ==========================================
 
-async function askGemini(message) {
+app.post("/api/chat", async (req, res) => {
+    try {
+        const message = req.body.message;
 
-    const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-        {
+        if (!message) {
+            return res.status(400).json({
+                error: "Message is required"
+            });
+        }
+
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({
+                error: "GEMINI_API_KEY is missing on server"
+            });
+        }
+
+        const url =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:streamGenerateContent?alt=sse";
+
+        const requestBody = {
+            systemInstruction: {
+                parts: [
+                    {
+                        text:
+                            "You are C-TECH AI, a helpful, friendly and intelligent AI assistant. " +
+                            "Answer the user's questions clearly and directly. " +
+                            "You can understand Hindi, Hinglish and English. " +
+                            "Keep answers useful and easy to understand."
+                    }
+                ]
+            },
+
+            contents: [
+                {
+                    role: "user",
+                    parts: [
+                        {
+                            text: message
+                        }
+                    ]
+                }
+            ],
+
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1024
+            }
+        };
+
+        const response = await fetch(url, {
             method: "POST",
 
             headers: {
                 "Content-Type": "application/json",
-                "x-goog-api-key": process.env.GEMINI_API_KEY
+                "x-goog-api-key": GEMINI_API_KEY
             },
 
-            body: JSON.stringify({
-
-                systemInstruction: {
-                    parts: [
-                        {
-                            text: `
-You are C-TECH AI, a helpful and intelligent AI assistant.
-
-Answer the user's actual question directly.
-Do not use fixed answers.
-Understand Hindi, Hinglish and English.
-Keep answers clear and useful.
-`
-                        }
-                    ]
-                },
-
-                contents: [
-                    {
-                        role: "user",
-
-                        parts: [
-                            {
-                                text: message
-                            }
-                        ]
-                    }
-                ],
-
-                generationConfig: {
-                    temperature: 0.3
-                }
-
-            })
-        }
-    );
-
-    const data = await response.json();
-
-    console.log("TEXT RESPONSE:", data);
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.error?.message ||
-            "Gemini API error"
-        );
-
-    }
-
-    const answer =
-        data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!answer) {
-
-        throw new Error(
-            "Gemini ne koi answer nahi diya."
-        );
-
-    }
-
-    return answer;
-}
-
-
-// ==========================================
-// CHAT API
-// ==========================================
-
-app.post("/api/chat", async (req, res) => {
-
-    try {
-
-        const message = req.body.message;
-
-        if (!message) {
-
-            return res.status(400).json({
-                error: "Message is required"
-            });
-
-        }
-
-
-        // API KEY CHECK
-        if (!process.env.GEMINI_API_KEY) {
-
-            return res.status(500).json({
-                error:
-                    "GEMINI_API_KEY nahi mili. .env file check karo."
-            });
-
-        }
-
-
-        // AI se answer lo
-        const answer =
-            await askGemini(message);
-
-
-        // Answer frontend ko bhejo
-        res.json({
-            answer: answer
+            body: JSON.stringify(requestBody)
         });
 
+        // ------------------------------------------
+        // If Gemini returns an error
+        // ------------------------------------------
+
+        if (!response.ok) {
+            const errorText = await response.text();
+
+            console.error("GEMINI ERROR:", errorText);
+
+            return res.status(response.status).json({
+                error: "Gemini API Error",
+                details: errorText
+            });
+        }
+
+        // ------------------------------------------
+        // STREAM RESPONSE TO BROWSER
+        // ------------------------------------------
+
+        res.status(200);
+
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        res.setHeader("X-Accel-Buffering", "no");
+
+        if (!response.body) {
+            return res.end();
+        }
+
+        const stream = Readable.fromWeb(response.body);
+
+        stream.on("error", (error) => {
+            console.error("STREAM ERROR:", error);
+
+            if (!res.headersSent) {
+                res.status(500).json({
+                    error: "Streaming error"
+                });
+            } else {
+                res.end();
+            }
+        });
+
+        stream.pipe(res);
 
     } catch (error) {
 
         console.error("CHAT ERROR:", error);
 
-        res.status(500).json({
-            error: error.message
-        });
-
+        if (!res.headersSent) {
+            res.status(500).json({
+                error: error.message || "Something went wrong"
+            });
+        } else {
+            res.end();
+        }
     }
-
 });
 
 
 // ==========================================
-// IMAGE GENERATION API
+// IMAGE GENERATION
 // ==========================================
 
 app.post("/api/image", async (req, res) => {
@@ -157,162 +146,95 @@ app.post("/api/image", async (req, res) => {
 
         const prompt = req.body.prompt;
 
-
         if (!prompt) {
-
             return res.status(400).json({
                 error: "Image prompt is required"
             });
-
         }
 
-
-        // API KEY CHECK
-        if (!process.env.GEMINI_API_KEY) {
-
+        if (!GEMINI_API_KEY) {
             return res.status(500).json({
-                error:
-                    "GEMINI_API_KEY nahi mili. .env file check karo."
+                error: "GEMINI_API_KEY is missing"
             });
-
         }
 
+        const url =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent";
 
-        console.log(
-            "Generating image:",
-            prompt
-        );
+        const requestBody = {
 
-
-        const response = await fetch(
-
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent",
-
-            {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json",
-
-                    "x-goog-api-key":
-                        process.env.GEMINI_API_KEY
-
-                },
-
-                body: JSON.stringify({
-
-                    contents: [
-
+            contents: [
+                {
+                    parts: [
                         {
-
-                            parts: [
-
-                                {
-                                    text: prompt
-                                }
-
-                            ]
-
+                            text: prompt
                         }
+                    ]
+                }
+            ]
 
-                    ],
+        };
 
-                    generationConfig: {
+        const response = await fetch(url, {
 
-                        responseModalities: [
-                            "IMAGE"
-                        ]
+            method: "POST",
 
-                    }
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": GEMINI_API_KEY
+            },
 
-                })
+            body: JSON.stringify(requestBody)
 
-            }
+        });
 
-        );
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "IMAGE RESPONSE RECEIVED"
-        );
-
+        const data = await response.json();
 
         if (!response.ok) {
 
-            console.error(data);
+            console.error("IMAGE ERROR:", data);
 
             return res.status(response.status).json({
-
                 error:
-                    data.error?.message ||
+                    data?.error?.message ||
                     "Image generation failed"
-
             });
 
         }
 
-
         const parts =
-            data.candidates?.[0]
-                ?.content?.parts || [];
-
+            data?.candidates?.[0]?.content?.parts || [];
 
         const imagePart =
             parts.find(
                 part => part.inlineData
             );
 
-
         if (!imagePart) {
 
             return res.status(500).json({
-
-                error:
-                    "Gemini ne image return nahi ki."
-
+                error: "No image was returned by Gemini"
             });
 
         }
 
+        return res.json({
 
-        const imageData =
-            imagePart.inlineData.data;
+            image:
+                imagePart.inlineData.data,
 
-
-        const mimeType =
-            imagePart.inlineData.mimeType ||
-            "image/png";
-
-
-        res.json({
-
-            image: imageData,
-
-            mimeType: mimeType
+            mimeType:
+                imagePart.inlineData.mimeType
 
         });
 
-
     } catch (error) {
 
-        console.error(
-            "IMAGE ERROR:",
-            error
-        );
+        console.error("IMAGE ERROR:", error);
 
-
-        res.status(500).json({
-
-            error:
-                error.message
-
+        return res.status(500).json({
+            error: error.message ||
+                "Image generation failed"
         });
 
     }
@@ -326,25 +248,8 @@ app.post("/api/image", async (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
 
-    console.log("");
     console.log(
-        "================================="
+        `C-TECH AI running on port ${PORT}`
     );
-
-    console.log(
-        "       C-TECH AI IS RUNNING"
-    );
-
-    console.log(
-        "================================="
-    );
-
-    console.log("");
-
-    console.log(
-        `Port: ${PORT}`
-    );
-
-    console.log("");
 
 });
