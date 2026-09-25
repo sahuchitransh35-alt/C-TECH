@@ -2,7 +2,9 @@
 <html lang="en">
 
 <head>
-<link rel="icon" type="image/png" href="ctech-logo.png">
+
+    <link rel="icon" type="image/png" href="ctech-logo.png">
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -10,41 +12,27 @@
 
     <title>C-TECH AI</title>
 
-
     <style>
 
         * {
             box-sizing: border-box;
         }
 
-
         body {
-
             margin: 0;
-
             font-family: Arial, sans-serif;
-
             background: #0f172a;
-
             color: white;
-
             height: 100vh;
 
             display: flex;
-
             justify-content: center;
-
             align-items: center;
-
         }
 
-
         .app {
-
             width: 95%;
-
             max-width: 900px;
-
             height: 90vh;
 
             background: #111827;
@@ -52,51 +40,55 @@
             border-radius: 18px;
 
             display: flex;
-
             flex-direction: column;
 
             overflow: hidden;
 
             box-shadow:
                 0 0 30px rgba(0,0,0,0.5);
-
         }
 
+        /* =========================
+           HEADER
+        ========================= */
 
         .header {
-.logo {
-    width: 55px;
-    height: 55px;
-    object-fit: contain;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-            padding: 20px;
+            padding: 15px 20px;
 
             background: #1e293b;
 
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
 
             font-size: 24px;
-
             font-weight: bold;
 
+            text-align: center;
         }
 
+        .logo {
+            width: 55px;
+            height: 55px;
+
+            object-fit: contain;
+        }
+
+        /* =========================
+           CHAT
+        ========================= */
 
         .chat {
-
             flex: 1;
 
             overflow-y: auto;
 
             padding: 20px;
-
         }
 
-
         .message {
-
             max-width: 80%;
 
             padding: 14px 18px;
@@ -110,86 +102,31 @@
             white-space: pre-wrap;
 
             word-wrap: break-word;
-
         }
 
-
         .user {
-
             background: #2563eb;
 
             margin-left: auto;
-
         }
-
 
         .ai {
-
             background: #334155;
 
             margin-right: auto;
-
         }
 
+        .typing {
+            opacity: 0.7;
 
-        .image-message {
-
-            max-width: 85%;
-
-            background: #334155;
-
-            margin-right: auto;
-
-            padding: 12px;
-
-            border-radius: 15px;
-
-            margin-bottom: 15px;
-
+            font-style: italic;
         }
 
-
-        .image-message img {
-
-            width: 100%;
-
-            max-width: 600px;
-
-            display: block;
-
-            border-radius: 12px;
-
-        }
-
-
-        .download-btn {
-
-            margin-top: 10px;
-
-            padding: 10px 15px;
-
-            border: none;
-
-            border-radius: 8px;
-
-            background: #2563eb;
-
-            color: white;
-
-            cursor: pointer;
-
-        }
-
-
-        .download-btn:hover {
-
-            background: #1d4ed8;
-
-        }
-
+        /* =========================
+           INPUT AREA
+        ========================= */
 
         .input-area {
-
             display: flex;
 
             gap: 10px;
@@ -197,12 +134,9 @@
             padding: 15px;
 
             background: #1e293b;
-
         }
 
-
         input {
-
             flex: 1;
 
             padding: 15px;
@@ -214,13 +148,10 @@
             border-radius: 10px;
 
             font-size: 16px;
-
         }
 
-
         button {
-
-            padding: 15px 18px;
+            padding: 15px 20px;
 
             border: none;
 
@@ -233,84 +164,49 @@
             cursor: pointer;
 
             font-size: 16px;
-
         }
-
 
         button:hover {
-
             background: #1d4ed8;
-
         }
 
-
         button:disabled {
-
             background: #64748b;
 
             cursor: not-allowed;
-
         }
 
-
-        .image-button {
-
-            background: #7c3aed;
-
-        }
-
-
-        .image-button:hover {
-
-            background: #6d28d9;
-
-        }
-
-
-        .typing {
-
-            opacity: 0.7;
-
-            font-style: italic;
-
-        }
-
+        /* =========================
+           MOBILE
+        ========================= */
 
         @media (max-width: 600px) {
 
             .app {
-
                 width: 100%;
 
                 height: 100vh;
 
                 border-radius: 0;
-
             }
-
 
             .message {
-
                 max-width: 90%;
-
             }
-
 
             .input-area {
-
                 flex-wrap: wrap;
-
             }
 
-
             input {
-
                 width: 100%;
 
                 flex-basis: 100%;
-
             }
 
+            button {
+                flex: 1;
+            }
         }
 
     </style>
@@ -320,26 +216,34 @@
 
 <body>
 
-
 <div class="app">
 
 
-    <!-- HEADER -->
+    <!-- =========================
+         HEADER
+    ========================== -->
 
     <div class="header">
-    <img src="ctech-logo.png" class="logo">
-    <span>C-TECH AI</span>
-</div>
 
-        🤖 C-TECH AI
+        <img
+            src="ctech-logo.png"
+            class="logo"
+            alt="C-TECH Logo"
+        >
+
+        <span>C-TECH AI</span>
 
     </div>
 
 
+    <!-- =========================
+         CHAT
+    ========================== -->
 
-    <!-- CHAT -->
-
-    <div class="chat" id="chat">
+    <div
+        class="chat"
+        id="chat"
+    >
 
         <div class="message ai">
 
@@ -347,15 +251,14 @@
 
             Mujhse kuch bhi poochho!
 
-            Ya 🎨 Create Image button se picture banao.
-
         </div>
 
     </div>
 
 
-
-    <!-- INPUT -->
+    <!-- =========================
+         INPUT
+    ========================== -->
 
     <div class="input-area">
 
@@ -366,25 +269,11 @@
             autocomplete="off"
         >
 
-
         <button
             id="sendButton"
             onclick="sendMessage()"
         >
-
             Send
-
-        </button>
-
-
-        <button
-            id="imageButton"
-            class="image-button"
-            onclick="generateImage()"
-        >
-
-            🎨 Create Image
-
         </button>
 
     </div>
@@ -393,138 +282,58 @@
 </div>
 
 
-
 <script>
 
+
+// ==========================================
+// ELEMENTS
+// ==========================================
 
 const input =
     document.getElementById("messageInput");
 
-
 const chat =
     document.getElementById("chat");
-
 
 const sendButton =
     document.getElementById("sendButton");
 
 
-const imageButton =
-    document.getElementById("imageButton");
-
-
-
-// ==================================
-// ADD TEXT MESSAGE
-// ==================================
+// ==========================================
+// ADD MESSAGE
+// ==========================================
 
 function addMessage(text, type) {
 
     const message =
         document.createElement("div");
 
-
     message.className =
         "message " + type;
-
 
     message.textContent =
         text;
 
-
     chat.appendChild(message);
 
-
     chat.scrollTop =
         chat.scrollHeight;
 
+    return message;
 }
 
 
-
-// ==================================
-// ADD IMAGE
-// ==================================
-
-function addImage(imageBase64, mimeType) {
-
-    const container =
-        document.createElement("div");
-
-
-    container.className =
-        "image-message";
-
-
-    const image =
-        document.createElement("img");
-
-
-    image.src =
-        `data:${mimeType};base64,${imageBase64}`;
-
-
-    image.alt =
-        "AI Generated Image";
-
-
-    const download =
-        document.createElement("button");
-
-
-    download.className =
-        "download-btn";
-
-
-    download.textContent =
-        "⬇️ Download Image";
-
-
-    download.onclick =
-        function() {
-
-            const link =
-                document.createElement("a");
-
-
-            link.href =
-                image.src;
-
-
-            link.download =
-                "c-tech-generated-image.png";
-
-
-            link.click();
-
-        };
-
-
-    container.appendChild(image);
-
-
-    container.appendChild(download);
-
-
-    chat.appendChild(container);
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-}
-
-
-
-// ==================================
+// ==========================================
 // ENTER KEY
-// ==================================
+// ==========================================
 
 input.addEventListener(
     "keydown",
     function(event) {
 
         if (event.key === "Enter") {
+
+            event.preventDefault();
 
             sendMessage();
 
@@ -534,10 +343,9 @@ input.addEventListener(
 );
 
 
-
-// ==================================
-// CHAT
-// ==================================
+// ==========================================
+// STREAMING CHAT
+// ==========================================
 
 async function sendMessage() {
 
@@ -545,12 +353,17 @@ async function sendMessage() {
         input.value.trim();
 
 
+    // Empty message
     if (!message) {
 
         return;
 
     }
 
+
+    // ======================================
+    // SHOW USER MESSAGE
+    // ======================================
 
     addMessage(
         message,
@@ -561,11 +374,8 @@ async function sendMessage() {
     input.value = "";
 
 
+    // Disable button
     sendButton.disabled =
-        true;
-
-
-    imageButton.disabled =
         true;
 
 
@@ -573,144 +383,24 @@ async function sendMessage() {
         "Thinking...";
 
 
-    try {
+    // ======================================
+    // CREATE AI MESSAGE
+    // ======================================
 
-
-        const response =
-            await fetch(
-                "/api/chat",
-                {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        message: message
-                    })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                "Something went wrong"
-            );
-
-        }
-
-
-        addMessage(
-            data.answer,
-            "ai"
-        );
-
-
-    }
-
-    catch (error) {
-
-
-        addMessage(
-            "❌ Error: " +
-            error.message,
-            "ai"
-        );
-
-
-    }
-
-    finally {
-
-
-        sendButton.disabled =
-            false;
-
-
-        imageButton.disabled =
-            false;
-
-
-        sendButton.textContent =
-            "Send";
-
-
-        input.focus();
-
-    }
-
-}
-
-
-
-// ==================================
-// IMAGE GENERATION
-// ==================================
-
-async function generateImage() {
-
-    const prompt =
-        input.value.trim();
-
-
-    if (!prompt) {
-
-        addMessage(
-            "🎨 Pehle batao kya picture banani hai.",
-            "ai"
-        );
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    addMessage(
-        "🎨 " + prompt,
-        "user"
-    );
-
-
-    input.value = "";
-
-
-    sendButton.disabled =
-        true;
-
-
-    imageButton.disabled =
-        true;
-
-
-    imageButton.textContent =
-        "Creating...";
-
-
-    const loading =
+    const aiMessage =
         document.createElement("div");
 
-
-    loading.className =
-        "message ai typing";
-
-
-    loading.textContent =
-        "🎨 C-TECH picture bana raha hai... thoda wait karo.";
+    aiMessage.className =
+        "message ai";
 
 
-    chat.appendChild(loading);
+    aiMessage.textContent =
+        "C-TECH AI is typing...";
+
+
+    chat.appendChild(
+        aiMessage
+    );
 
 
     chat.scrollTop =
@@ -720,79 +410,307 @@ async function generateImage() {
     try {
 
 
+        // ==================================
+        // SEND REQUEST
+        // ==================================
+
         const response =
             await fetch(
-                "/api/image",
+                "/api/chat",
                 {
 
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
-                    body: JSON.stringify({
-                        prompt: prompt
-                    })
+                    body:
+                        JSON.stringify({
+                            message: message
+                        })
 
                 }
             );
 
 
-        const data =
-            await response.json();
-
-
-        loading.remove();
-
+        // ==================================
+        // ERROR CHECK
+        // ==================================
 
         if (!response.ok) {
 
+            let errorMessage =
+                "Something went wrong.";
+
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+
+                errorMessage =
+                    errorData.error ||
+                    errorMessage;
+
+
+                console.error(
+                    "Server error:",
+                    errorData
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Could not read error:",
+                    error
+                );
+
+            }
+
+
             throw new Error(
-                data.error ||
-                "Image generation failed"
+                errorMessage
             );
 
         }
 
 
-        addImage(
-            data.image,
-            data.mimeType
-        );
+        // ==================================
+        // STREAM CHECK
+        // ==================================
 
+        if (!response.body) {
+
+            throw new Error(
+                "Streaming is not supported."
+            );
+
+        }
+
+
+        // ==================================
+        // CREATE STREAM READER
+        // ==================================
+
+        const reader =
+            response.body.getReader();
+
+
+        const decoder =
+            new TextDecoder("utf-8");
+
+
+        let buffer =
+            "";
+
+        let fullAnswer =
+            "";
+
+
+        // Remove typing message
+
+        aiMessage.textContent =
+            "";
+
+
+        sendButton.textContent =
+            "Generating...";
+
+
+        // ==================================
+        // READ STREAM
+        // ==================================
+
+        while (true) {
+
+
+            const result =
+                await reader.read();
+
+
+            const value =
+                result.value;
+
+
+            const done =
+                result.done;
+
+
+            if (done) {
+
+                break;
+
+            }
+
+
+            // Decode incoming data
+
+            buffer +=
+                decoder.decode(
+                    value,
+                    {
+                        stream: true
+                    }
+                );
+
+
+            // SSE events
+            const events =
+                buffer.split("\n\n");
+
+
+            // Keep unfinished event
+
+            buffer =
+                events.pop() || "";
+
+
+            // ==================================
+            // PROCESS EVENTS
+            // ==================================
+
+            for (
+                const event of events
+            ) {
+
+
+                const lines =
+                    event.split("\n");
+
+
+                for (
+                    const line of lines
+                ) {
+
+
+                    if (
+                        !line.startsWith("data:")
+                    ) {
+
+                        continue;
+
+                    }
+
+
+                    const jsonText =
+                        line
+                            .replace(
+                                /^data:\s*/,
+                                ""
+                            )
+                            .trim();
+
+
+                    if (!jsonText) {
+
+                        continue;
+
+                    }
+
+
+                    try {
+
+
+                        const data =
+                            JSON.parse(
+                                jsonText
+                            );
+
+
+                        const text =
+                            data
+                                ?.candidates?.[0]
+                                ?.content?.parts?.[0]
+                                ?.text;
+
+
+                        if (text) {
+
+
+                            fullAnswer +=
+                                text;
+
+
+                            aiMessage.textContent =
+                                fullAnswer;
+
+
+                            chat.scrollTop =
+                                chat.scrollHeight;
+
+                        }
+
+                    }
+
+
+                    catch (error) {
+
+                        console.log(
+                            "Stream parsing:",
+                            error
+                        );
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        // ==================================
+        // EMPTY RESPONSE
+        // ==================================
+
+        if (!fullAnswer.trim()) {
+
+            aiMessage.textContent =
+                "C-TECH AI ne koi response nahi diya.";
+
+        }
 
     }
+
+
+    // ======================================
+    // ERROR
+    // ======================================
 
     catch (error) {
 
-
-        loading.remove();
-
-
-        addMessage(
-            "❌ Image Error: " +
-            error.message,
-            "ai"
+        console.error(
+            "CHAT ERROR:",
+            error
         );
+
+
+        aiMessage.textContent =
+            "❌ Error: " +
+            error.message;
 
     }
 
 
-    finally {
+    // ======================================
+    // RESET BUTTON
+    // ======================================
 
+    finally {
 
         sendButton.disabled =
             false;
 
 
-        imageButton.disabled =
-            false;
-
-
-        imageButton.textContent =
-            "🎨 Create Image";
+        sendButton.textContent =
+            "Send";
 
 
         input.focus();
