@@ -136,8 +136,7 @@ app.post("/api/chat", async (req, res) => {
 });
 
 
-(PORT, "0.0.0.0", () => {
-
+app.listen(PORT, "0.0.0.0", () => {
     console.log(
         `C-TECH AI running on port ${PORT}`
     );
